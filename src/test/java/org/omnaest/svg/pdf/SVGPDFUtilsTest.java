@@ -26,11 +26,13 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.stream.Collectors;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class SVGPDFUtilsTest
 {
 	@Test
+	@Ignore
 	public void test() throws MalformedURLException, IOException
 	{
 		String svg = Files	.readAllLines(new File("C:/Temp/svgAnkerTest.svg").toPath(), StandardCharsets.UTF_8)
