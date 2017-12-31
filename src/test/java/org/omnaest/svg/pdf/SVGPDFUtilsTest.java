@@ -28,17 +28,35 @@ import java.util.stream.Collectors;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.omnaest.svg.SVGDrawer;
+import org.omnaest.svg.SVGUtils;
+import org.omnaest.svg.elements.composite.SVGTextBox;
 
 public class SVGPDFUtilsTest
 {
-	@Test
-	@Ignore
-	public void test() throws MalformedURLException, IOException
-	{
-		String svg = Files	.readAllLines(new File("C:/Temp/svgAnkerTest.svg").toPath(), StandardCharsets.UTF_8)
-							.stream()
-							.collect(Collectors.joining());
-		byte[] pdf = SVGPDFUtils.toPDF(svg);
-		Files.write(new File("C:/Temp/svgAnkerTest.pdf").toPath(), pdf, StandardOpenOption.CREATE);
-	}
+    @Test
+    @Ignore
+    public void test() throws MalformedURLException, IOException
+    {
+        String svg = Files.readAllLines(new File("C:/Temp/svgAnkerTest.svg").toPath(), StandardCharsets.UTF_8)
+                          .stream()
+                          .collect(Collectors.joining());
+        byte[] pdf = SVGPDFUtils.toPDF(svg);
+        Files.write(new File("C:/Temp/svgAnkerTest.pdf").toPath(), pdf, StandardOpenOption.CREATE);
+    }
+
+    @Test
+    //    @Ignore
+    public void testTextBox() throws MalformedURLException, IOException
+    {
+        SVGDrawer drawer = SVGUtils.getDrawer(1000, 800);
+        drawer.newBoundedArea()
+              .withScalingHeight(100)
+              .withScalingWidth(100)
+              .add(new SVGTextBox(0, 0, 100, 20, "This is a test").setBorderSize(2)
+                                                                  .setBorderColor("black"));
+        String svg = drawer.render();
+        byte[] pdf = SVGPDFUtils.toPDF(svg);
+        Files.write(new File("C:/Temp/svgTextBoxTest.pdf").toPath(), pdf, StandardOpenOption.CREATE);
+    }
 }

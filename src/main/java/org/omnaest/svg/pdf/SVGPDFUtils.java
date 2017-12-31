@@ -34,97 +34,168 @@ import org.apache.batik.transcoder.image.JPEGTranscoder;
 import org.apache.commons.io.FileUtils;
 import org.apache.fop.svg.PDFTranscoder;
 
+/**
+ * Helps to convert svg into pdf
+ * 
+ * @see #toPDF(String)
+ * @see #toPDFResult(String)
+ * @author omnaest
+ */
 public class SVGPDFUtils
 {
 
-	public static byte[] toPDF(String svg)
-	{
-		//	return convert(svg, DestinationType.PDF); 
-		return convert2(svg, new PDFTranscoder());
-	}
+    /**
+     * Result of a pdf data generation
+     * 
+     * @see #get()
+     * @see #writeTo(File)
+     * @author omnaest
+     */
+    public static interface PDFResult
+    {
+        /**
+         * Returns the pdf data as {@link Byte} array
+         * 
+         * @return
+         */
+        public byte[] get();
 
-	@Deprecated
-	private static byte[] toJPG(String svg)
-	{
-		//return new byte[0];
-		//	return convert(svg, DestinationType.JPEG); 
-		return convert2(svg, new JPEGTranscoder());
-	}
+        /**
+         * Writes the pdf data to the given {@link File}
+         * 
+         * @param file
+         * @return
+         * @throws IOException
+         */
+        public PDFResult writeTo(File file) throws IOException;
+    }
 
-	private static byte[] convert2(String svg, Transcoder transcoder)
-	{
-		//
-		ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+    /**
+     * Converts the given svg {@link String} into a pdf
+     * 
+     * @see #toPDFResult(String)
+     * @param svg
+     * @return
+     */
+    public static byte[] toPDF(String svg)
+    {
+        //	return convert(svg, DestinationType.PDF); 
+        return convert2(svg, new PDFTranscoder());
+    }
 
-		// 
-		try
-		{
+    /**
+     * Converts the given svg {@link String} into a {@link PDFResult}
+     * 
+     * @param svg
+     * @return
+     */
+    public static PDFResult toPDFResult(String svg)
+    {
+        return new PDFResult()
+        {
+            private byte[] data = toPDF(svg);
 
-			transcoder.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, 0.9f);
-			transcoder.addTranscodingHint(JPEGTranscoder.KEY_XML_PARSER_VALIDATING, false);
-			TranscoderInput input = new TranscoderInput(new StringReader(svg));
-			TranscoderOutput output = new TranscoderOutput(ostream);
+            @Override
+            public PDFResult writeTo(File file) throws IOException
+            {
+                FileUtils.writeByteArrayToFile(file, this.data);
+                return this;
+            }
 
-			transcoder.transcode(input, output);
+            @Override
+            public byte[] get()
+            {
+                return this.data;
+            }
+        };
+    }
 
-		} catch (TranscoderException e)
-		{
-			throw new RuntimeException(e);
-		} finally
-		{
-			try
-			{
-				ostream.flush();
-				ostream.close();
-			} catch (IOException e)
-			{
-				throw new RuntimeException();
-			}
-		}
-		return ostream.toByteArray();
-	}
+    @Deprecated
+    private static byte[] toJPG(String svg)
+    {
+        //return new byte[0];
+        //	return convert(svg, DestinationType.JPEG); 
+        return convert2(svg, new JPEGTranscoder());
+    }
 
-	private static byte[] convert(String svg, DestinationType destinationType)
-	{
-		byte[] retval = null;
-		try
-		{
-			File tempDirectory = FileUtils.getTempDirectory();
+    private static byte[] convert2(String svg, Transcoder transcoder)
+    {
+        //
+        ByteArrayOutputStream ostream = new ByteArrayOutputStream();
 
-			//
-			File intermediateFile = new File(tempDirectory, "intermediate.svg");
-			File outputDirectory = new File(tempDirectory, "intermediate.out");
+        // 
+        try
+        {
 
-			FileUtils.deleteQuietly(intermediateFile);
-			FileUtils.deleteQuietly(outputDirectory);
-			FileUtils.forceMkdir(outputDirectory);
+            transcoder.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, 0.9f);
+            transcoder.addTranscodingHint(JPEGTranscoder.KEY_XML_PARSER_VALIDATING, false);
+            TranscoderInput input = new TranscoderInput(new StringReader(svg));
+            TranscoderOutput output = new TranscoderOutput(ostream);
 
-			FileUtils.write(intermediateFile, svg, "utf-8");
-			System.out.println(outputDirectory.getAbsolutePath());
+            transcoder.transcode(input, output);
 
-			//
-			SVGConverter converter = new SVGConverter();
+        }
+        catch (TranscoderException e)
+        {
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            try
+            {
+                ostream.flush();
+                ostream.close();
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException();
+            }
+        }
+        return ostream.toByteArray();
+    }
 
-			converter.setDestinationType(destinationType);
-			converter.setSources(new String[] { intermediateFile.getAbsolutePath() });
+    private static byte[] convert(String svg, DestinationType destinationType)
+    {
+        byte[] retval = null;
+        try
+        {
+            File tempDirectory = FileUtils.getTempDirectory();
 
-			converter.setDst(outputDirectory);
-			converter.execute();
+            //
+            File intermediateFile = new File(tempDirectory, "intermediate.svg");
+            File outputDirectory = new File(tempDirectory, "intermediate.out");
 
-			//
-			Thread.sleep(100);
-			File outputfile = outputDirectory.isDirectory() ? outputDirectory.listFiles()[0] : outputDirectory;
-			retval = FileUtils.readFileToByteArray(outputfile);
+            FileUtils.deleteQuietly(intermediateFile);
+            FileUtils.deleteQuietly(outputDirectory);
+            FileUtils.forceMkdir(outputDirectory);
 
-			//
-			FileUtils.forceDelete(outputDirectory);
-			FileUtils.forceDelete(intermediateFile);
+            FileUtils.write(intermediateFile, svg, "utf-8");
+            System.out.println(outputDirectory.getAbsolutePath());
 
-		} catch (SVGConverterException | IOException | InterruptedException e)
-		{
-			throw new RuntimeException(e);
-		}
+            //
+            SVGConverter converter = new SVGConverter();
 
-		return retval;
-	}
+            converter.setDestinationType(destinationType);
+            converter.setSources(new String[] { intermediateFile.getAbsolutePath() });
+
+            converter.setDst(outputDirectory);
+            converter.execute();
+
+            //
+            Thread.sleep(100);
+            File outputfile = outputDirectory.isDirectory() ? outputDirectory.listFiles()[0] : outputDirectory;
+            retval = FileUtils.readFileToByteArray(outputfile);
+
+            //
+            FileUtils.forceDelete(outputDirectory);
+            FileUtils.forceDelete(intermediateFile);
+
+        }
+        catch (SVGConverterException | IOException | InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return retval;
+    }
 }
