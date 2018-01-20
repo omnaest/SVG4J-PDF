@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.function.Function;
 
 import org.apache.batik.apps.rasterizer.DestinationType;
 import org.apache.batik.apps.rasterizer.SVGConverter;
@@ -43,6 +44,16 @@ import org.apache.fop.svg.PDFTranscoder;
  */
 public class SVGPDFUtils
 {
+
+    /**
+     * Returns a {@link Function} which maps an svg {@link String} to a pdf byte result
+     * 
+     * @return
+     */
+    public static Function<String, byte[]> newSVGToPDFMapper()
+    {
+        return svg -> toPDF(svg);
+    }
 
     /**
      * Result of a pdf data generation
