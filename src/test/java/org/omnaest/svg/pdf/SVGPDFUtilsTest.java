@@ -59,4 +59,14 @@ public class SVGPDFUtilsTest
         byte[] pdf = SVGPDFUtils.toPDF(svg);
         Files.write(new File("C:/Temp/svgTextBoxTest.pdf").toPath(), pdf, StandardOpenOption.CREATE);
     }
+
+    @Test
+    public void testToPNGResult() throws Exception
+    {
+        String svg = Files.readAllLines(new File("C:\\Temp\\stocks2\\5c75925b2a15c68470e7c0ba.svg").toPath(), StandardCharsets.UTF_8)
+                          .stream()
+                          .collect(Collectors.joining());
+        SVGPDFUtils.toPNGResult(svg)
+                   .writeTo(new File("C:/Temp/stocks2/atest.png"));
+    }
 }

@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.apache.batik.apps.rasterizer.DestinationType;
 import org.apache.batik.apps.rasterizer.SVGConverter;
@@ -32,6 +33,7 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.JPEGTranscoder;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.apache.commons.io.FileUtils;
 import org.apache.fop.svg.PDFTranscoder;
 
@@ -79,6 +81,32 @@ public class SVGPDFUtils
          * @throws IOException
          */
         public PDFResult writeTo(File file) throws IOException;
+
+    }
+
+    /**
+     * Wrapper around a PNG image data result
+     * 
+     * @author omnaest
+     * @see #writeTo(File)
+     * @see #get()
+     */
+    public static interface PNGResult
+    {
+        /**
+         * Returns the raw bytes of the PNG image
+         * 
+         * @return
+         */
+        public byte[] get();
+
+        /**
+         * Writes the PNG image to the given {@link File}
+         * 
+         * @param file
+         * @return
+         */
+        public PNGResult writeTo(File file);
     }
 
     /**
@@ -92,6 +120,16 @@ public class SVGPDFUtils
     {
         //	return convert(svg, DestinationType.PDF); 
         return convert2(svg, new PDFTranscoder());
+    }
+
+    public static Supplier<byte[]> toPDFSupplier(Supplier<String> svg)
+    {
+        return () -> toPDF(svg.get());
+    }
+
+    public static Supplier<byte[]> toPDFSupplier(String svg)
+    {
+        return () -> toPDF(svg);
     }
 
     /**
@@ -118,6 +156,7 @@ public class SVGPDFUtils
             {
                 return this.data;
             }
+
         };
     }
 
@@ -163,6 +202,69 @@ public class SVGPDFUtils
             }
         }
         return ostream.toByteArray();
+    }
+
+    /**
+     * Converts a given svg xml {@link String} to a PNG image
+     * 
+     * @param svg
+     * @return
+     */
+    public static PNGResult toPNGResult(String svg)
+    {
+        //
+        ByteArrayOutputStream ostream = new ByteArrayOutputStream();
+
+        // 
+        try
+        {
+            PNGTranscoder transcoder = new PNGTranscoder();
+            TranscoderInput input = new TranscoderInput(new StringReader(svg));
+            TranscoderOutput output = new TranscoderOutput(ostream);
+
+            transcoder.transcode(input, output);
+
+        }
+        catch (TranscoderException e)
+        {
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            try
+            {
+                ostream.flush();
+                ostream.close();
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException();
+            }
+        }
+        byte[] data = ostream.toByteArray();
+        return new PNGResult()
+        {
+
+            @Override
+            public PNGResult writeTo(File file)
+            {
+                try
+                {
+                    FileUtils.writeByteArrayToFile(file, data);
+                }
+                catch (IOException e)
+                {
+                    throw new IllegalStateException(e);
+                }
+                return this;
+            }
+
+            @Override
+            public byte[] get()
+            {
+                return data;
+            }
+        };
     }
 
     private static byte[] convert(String svg, DestinationType destinationType)
