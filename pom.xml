@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.omnaest.svg</groupId>
 	<artifactId>SVG4J-PDF</artifactId>
 	<parent>
-		<groupId>org.omnaest.commons</groupId>
+		<groupId>org.omnaest.utils</groupId>
 		<artifactId>CommonsParent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
@@ -29,6 +30,16 @@
 		<java.version>1.8</java.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 	<dependencies>
 
 		<dependency>
@@ -36,29 +47,29 @@
 			<artifactId>SVG4J</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		
-		  <dependency>
-            <groupId>org.omnaest.utils</groupId>
-            <artifactId>CommonsLangAndIO</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.omnaest.utils</groupId>
-            <artifactId>CommonsTest</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.omnaest.utils</groupId>
-            <artifactId>CommonsLog</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.omnaest.utils</groupId>
-            <artifactId>CommonsJSONAndXML</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-		
+
+		<dependency>
+			<groupId>org.omnaest.utils</groupId>
+			<artifactId>CommonsLangAndIO</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.omnaest.utils</groupId>
+			<artifactId>CommonsTest</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.omnaest.utils</groupId>
+			<artifactId>CommonsLog</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.omnaest.utils</groupId>
+			<artifactId>CommonsJSONAndXML</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.omnaest.pdf</groupId>
 			<artifactId>CommonsPDF</artifactId>
@@ -189,12 +200,18 @@
 			<groupId>org.apache.xmlgraphics</groupId>
 			<artifactId>fop</artifactId>
 			<version>2.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.pdfbox</groupId>
+					<artifactId>fontbox</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 
-	
+
 	</dependencies>
-	
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
