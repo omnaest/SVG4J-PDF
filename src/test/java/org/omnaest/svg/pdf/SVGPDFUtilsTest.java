@@ -61,7 +61,7 @@ public class SVGPDFUtilsTest
     }
 
     @Test
-    //    @Ignore
+    @Ignore
     public void testTextBox() throws MalformedURLException, IOException
     {
         SVGDrawer drawer = SVGUtils.getDrawer(1000, 800);
@@ -76,6 +76,7 @@ public class SVGPDFUtilsTest
     }
 
     @Test
+    @Ignore
     public void testToPNGResult() throws Exception
     {
         String svg = Files.readAllLines(new File("C:\\Temp\\stocks2\\5c75925b2a15c68470e7c0ba.svg").toPath(), StandardCharsets.UTF_8)
