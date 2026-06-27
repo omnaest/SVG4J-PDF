@@ -155,8 +155,7 @@ public class SVGPDFUtils
      */
     public static PDFResult toPDFResult(String svg)
     {
-        return new PDFResult()
-        {
+        return new PDFResult() {
             private byte[] data = toPDF(svg);
 
             @Override
@@ -257,8 +256,7 @@ public class SVGPDFUtils
             }
         }
         byte[] data = ostream.toByteArray();
-        return new PNGResult()
-        {
+        return new PNGResult() {
 
             @Override
             public PNGResult writeTo(File file)
@@ -304,7 +302,7 @@ public class SVGPDFUtils
             SVGConverter converter = new SVGConverter();
 
             converter.setDestinationType(destinationType);
-            converter.setSources(new String[] { intermediateFile.getAbsolutePath() });
+            converter.setSources(new String[] {intermediateFile.getAbsolutePath()});
 
             converter.setDst(outputDirectory);
             converter.execute();
